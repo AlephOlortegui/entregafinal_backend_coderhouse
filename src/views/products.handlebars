@@ -15,3 +15,11 @@
 {{#if hasNextPage}}
   <a href="{{nextLink}}">Siguiente</a>
 {{/if}}
+
+<script>
+    function addToCart(productId) {
+        fetch(`/carts/add/${productId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => alert(data.message));
+    }
+</script>

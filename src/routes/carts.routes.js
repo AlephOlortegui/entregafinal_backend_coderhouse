@@ -2,6 +2,22 @@ import {Router} from 'express'
 import Cart from '../models/Cart.js';
 const router = Router();
 
+// Obtener un carrito por ID con los productos populados
+router.get('/:cid', async (req, res) => {
+  try {
+    const cart = await Cart.findById(req.params.cid).populate('products.product');
+    if (!cart) return res.status(404).json({ message: 'Carrito no encontrado' });
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener el carrito', error });
+  }
+});
+
+/* 
+    DELETE api/carts/:cid/products/:pid 
+    deberá eliminar del carrito el producto seleccionado.
+ */
+
 router.delete("/:cid/products/:pid", async (req, res) => {
   const { cid, pid } = req.params;
   const cart = await Cart.findById(cid);
@@ -13,6 +29,12 @@ router.delete("/:cid/products/:pid", async (req, res) => {
   res.json(cart);
 });
 
+/* 
+  PUT api/carts/:cid 
+  deberá actualizar todos los productos del 
+  carrito con un arreglo de productos. 
+*/
+
 router.put("/:cid", async (req, res) => {
   const { cid } = req.params;
   const { products } = req.body;
@@ -20,6 +42,13 @@ router.put("/:cid", async (req, res) => {
   const cart = await Cart.findByIdAndUpdate(cid, { products }, { new: true });
   res.json(cart);
 });
+
+/* 
+  PUT api/carts/:cid/products/:pid 
+  deberá poder actualizar SÓLO la 
+  cantidad de ejemplares del producto 
+  por cualquier cantidad pasada desde req.body
+*/
 
 router.put("/:cid/products/:pid", async (req, res) => {
   const { cid, pid } = req.params;
@@ -36,8 +65,14 @@ router.put("/:cid/products/:pid", async (req, res) => {
   res.json(cart);
 });
 
+/* 
+DELETE api/carts/:cid 
+deberá eliminar todos los productos del carrito */
+
 router.delete("/:cid", async (req, res) => {
   const { cid } = req.params;
   await Cart.findByIdAndUpdate(cid, { products: [] });
   res.sendStatus(204);
 });
+
+export default router;

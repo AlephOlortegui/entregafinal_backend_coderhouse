@@ -1,8 +1,11 @@
 import express from "express";
 import handlebars from "express-handlebars";
+import { connectDB } from "./config/db.js";
+
+// routes
 import productsRouter from "./routes/products.routes.js";
 import cartsRouter from "./routes/carts.routes.js";
-import { connectDB } from "./config/db.js";
+import viewsRouter from "./routes/views.routes.js";
 
 const app = express();
 const PORT = 3000;
@@ -16,7 +19,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // Configurar Handlebars
-app.engine("handlebars", handlebars.engine());
+app.engine("handlebars", handlebars.engine({
+  defaultLayout: 'main',
+  layoutsDir: path.join(__dirname, 'views', 'layouts'),
+  partialsDir: path.join(__dirname, 'views', 'partials')
+}));
 app.set("view engine", "handlebars");
 app.set("views", "./src/views");
 
